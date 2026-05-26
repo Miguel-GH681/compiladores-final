@@ -10,6 +10,7 @@ function App() {
   const [producciones, setProducciones] = useState([]);
   const [gramaticaSinRecursion, setGramaticaSinRecursion] = useState([]);
   const [variablesSinRecursion, setVariablesSinRecursion] = useState([]);
+  const [terminalesSinRecursion, setTerminalesSinRecursion] = useState([]);
 
   const analizarTexto = () => {
 
@@ -89,6 +90,7 @@ function App() {
 
     const resultado = [];
     const listaDeVariables = [];
+    const listaDeTerminales = [];
     /*
       Analizar variable por variable
     */
@@ -152,11 +154,11 @@ function App() {
         });
 
         /*
-          A' :: ε
+          A' :: e
         */
         resultado.push({
           variable: nuevaVariable,
-          produccion: "ε",
+          produccion: "e",
         });
       }
     });
@@ -167,8 +169,19 @@ function App() {
       }
     })
 
+    resultado.forEach(gsr => {
+      gsr.produccion.split(" ").forEach(elemento => {
+        console.log(`elemento: ${elemento}`);
+        
+        if(!listaDeVariables.includes(elemento) && !listaDeTerminales.includes(elemento)){
+          listaDeTerminales.push(elemento);
+        }
+      })
+    });
+
     setGramaticaSinRecursion(resultado);
     setVariablesSinRecursion(listaDeVariables);
+    setTerminalesSinRecursion(listaDeTerminales);
   };
 
   useEffect(() => {
@@ -348,6 +361,24 @@ function App() {
                         variablesSinRecursion.map((variable, index) => (
                           <tr key={index}>
                             <td>{variable}</td>
+                          </tr>
+                        ))
+                      }
+                    </tbody>
+                  </table>
+                </div>
+                <div className="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th><b>T</b></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {
+                        terminalesSinRecursion.map((terminal, index) => (
+                          <tr key={index}>
+                            <td>{terminal}</td>
                           </tr>
                         ))
                       }
