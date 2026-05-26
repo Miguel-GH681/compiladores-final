@@ -130,7 +130,7 @@ function App() {
         /*
           Crear nueva variable
         */
-        const nuevaVariable = `${variable}'`;
+        const nuevaVariable = `${variable}!`;
         /*
           A :: β A'
         */
@@ -321,36 +321,72 @@ function App() {
               variablesSinRecursion.map(vsr =>{
                 const produccionesXVariable = gramaticaSinRecursion.filter(gsr => gsr.variable == vsr);
                 
-                const texto = produccionesXVariable.map(pxv => pxv.produccion).join(" | ");
+                const texto = produccionesXVariable.map(pxv => pxv.produccion.replaceAll(" ", "")).join("|");
               
-                return `${vsr} :: ${texto}`
+                return `${vsr.length > 1 ? vsr.trim() : vsr.trim().concat(" ")}:: ${texto}`
               }).join("\n")
             }
 
           />
 
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>V</th>
-                  <th>Producciones</th>
-                </tr>
-              </thead>
-              
-              <tbody>
-                {
-                  gramaticaSinRecursion.map(
-                    (item, index) => (
-                      <tr key={index}>
-                        <td>{item.variable}</td>
-                        <td>{item.produccion}</td>
+          <div className="bottom-row">
+            <div className="bottom-left-container">
+              <div className="bottom-left-container-title">
+                <p><b>Vectores</b></p>
+                <hr />
+              </div>
+              <div className="bottom-left">
+                <div className="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th><b>V</b></th>
                       </tr>
-                    )
-                  )
-                }
-              </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                      {
+                        variablesSinRecursion.map((variable, index) => (
+                          <tr key={index}>
+                            <td>{variable}</td>
+                          </tr>
+                        ))
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div className="bottom-right-container">
+              <div className="bottom-right-container-title">
+                <p><b>Matriz de producciones</b></p>
+                <hr />
+              </div>
+              <div className="bottom-right">
+                <div className="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>V</th>
+                        <th>Producciones</th>
+                      </tr>
+                    </thead>
+                    
+                    <tbody>
+                      {
+                        gramaticaSinRecursion.map(
+                          (item, index) => (
+                            <tr key={index}>
+                              <td>{item.variable}</td>
+                              <td>{item.produccion}</td>
+                            </tr>
+                          )
+                        )
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

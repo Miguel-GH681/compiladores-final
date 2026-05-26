@@ -55,6 +55,10 @@ body,
 .right-column {
   width: 50%;
   padding: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 /* =========================
@@ -71,7 +75,7 @@ body,
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
+  margin-bottom: 5px;
 }
 
 .editor-header h2 {
@@ -92,7 +96,7 @@ body,
   height: 45vh;
   resize: none;
   padding: 12px;
-  font-size: 22px;
+  font-size: 25px;
   font-family: Consolas, monospace;
   border: 1px solid #cfcfcf;
   border-radius: 6px;
