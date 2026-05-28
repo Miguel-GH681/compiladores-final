@@ -196,3 +196,43 @@ th {
 
   background-color: #f0f0f0;
 }
+
+
+/* =======================================
+   SEGUNDA PANTALLA
+======================================= */
+
+.second-screen {
+
+  width: 100%;
+
+  height: 100vh;
+
+  display: flex;
+}
+
+.second-left {
+
+  width: 33.33%;
+
+  border-right: 1px solid #dcdcdc;
+
+  display: flex;
+
+  flex-direction: column;
+}
+
+.second-right {
+
+  width: 66.66%;
+}
+
+.second-top,
+.second-bottom {
+
+  height: 50%;
+
+  overflow-y: auto;
+
+  border-bottom: 1px solid #dcdcdc;
+}

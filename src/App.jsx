@@ -11,7 +11,9 @@ function App() {
   const [gramaticaSinRecursion, setGramaticaSinRecursion] = useState([]);
   const [variablesSinRecursion, setVariablesSinRecursion] = useState([]);
   const [terminalesSinRecursion, setTerminalesSinRecursion] = useState([]);
-
+  const [primeros, setPrimeros] = useState({});
+  const [siguientes, setSiguientes] = useState({});
+ 
   const analizarTexto = () => {
 
     const variablesEncontradas = [];
@@ -182,6 +184,175 @@ function App() {
     setGramaticaSinRecursion(resultado);
     setVariablesSinRecursion(listaDeVariables);
     setTerminalesSinRecursion(listaDeTerminales);
+
+    calcularPrimeros(listaDeVariables, resultado);
+  };
+
+  const calcularPrimeros = (listaDeVariablesP, gramaticaSinRecursionP) => {
+    const primerosTemp = {};
+
+    /*
+      Inicializar
+    */
+    listaDeVariablesP.forEach((v) => {
+      primerosTemp[v] = [];
+    });
+
+    let cambios = true;
+
+    while (cambios) {
+      cambios = false;
+
+      gramaticaSinRecursionP.forEach((item) => {
+        const A = item.variable;
+        const simbolos = item.produccion.split(" ");
+        const primerSimbolo = simbolos[0];
+
+        /*
+          Si es terminal
+        */
+        if (!listaDeVariablesP.includes(primerSimbolo)) {
+          if (!primerosTemp[A].includes(primerSimbolo)) {
+            primerosTemp[A].push(primerSimbolo);
+            cambios = true;
+          }
+        } else {
+          /*
+            Si es variable
+          */
+          primerosTemp[primerSimbolo].forEach((x) => {
+            if (!primerosTemp[A].includes(x)) {
+              primerosTemp[A].push(x);
+              cambios = true;
+            }
+          });
+        }
+      });
+    }
+
+    setPrimeros(primerosTemp);
+    calcularSiguientes(listaDeVariablesP, gramaticaSinRecursionP, primerosTemp);
+  };
+
+  const calcularSiguientes = (variablesSinRecursionP, gramaticaSinRecursionP, primerosP) => {
+    const siguientesTemp = {};
+
+    /*
+      Inicializar FOLLOW
+    */
+    variablesSinRecursionP.forEach((v) => {
+      siguientesTemp[v] = [];
+    });
+
+    /*
+      Símbolo inicial
+    */
+    const simboloInicial = variablesSinRecursionP[0];
+    siguientesTemp[simboloInicial].push("$");
+
+    let cambios = true;
+
+    while (cambios) {
+      cambios = false;
+
+      /*
+        Recorrer producciones
+      */
+      gramaticaSinRecursionP.forEach((item) => {
+        const A = item.variable;
+        const simbolos = item.produccion.split(" ");
+
+        /*
+          Recorrer símbolos
+        */
+        for (let i = 0; i < simbolos.length; i++) {
+
+          const B = simbolos[i];
+
+          /*
+            Solo variables
+          */
+          if (variablesSinRecursionP.includes(B)) {
+
+            /*
+              Obtener β
+            */
+            const beta =simbolos.slice(i + 1);
+
+            /*
+              Caso:
+              A -> α B
+            */
+            if (beta.length === 0) {
+              siguientesTemp[A].forEach((x) => {
+                if (!siguientesTemp[B].includes(x)) {
+                  siguientesTemp[B].push(x);
+                  cambios = true;
+                }
+              });
+            } else {
+              /*
+                FIRST(β)
+              */
+              let betaPuedeEpsilon = true;
+
+              for (let j = 0; j < beta.length; j++) {
+                const simboloBeta = beta[j];
+
+                /*
+                  TERMINAL
+                */
+                if (!variablesSinRecursionP.includes(simboloBeta)) {
+                  if (simboloBeta !== "e" && !siguientesTemp[B].includes(simboloBeta)) {
+                    siguientesTemp[B].push(simboloBeta);
+                    cambios = true;
+                  }
+
+                  betaPuedeEpsilon = false;
+                  break;
+                } else {
+                  /*
+                    VARIABLE
+                  */
+                  const firstBeta = primerosP[simboloBeta] || [];
+
+                  /*
+                    FIRST(β) - e
+                  */
+                  firstBeta.forEach((x) => {
+                    if (x !== "e" && !siguientesTemp[B].includes(x)) {
+                      siguientesTemp[B].push(x);
+                      cambios = true;
+                    }
+                  });
+
+                  /*
+                    ¿Tiene e?
+                  */
+                  if (!firstBeta.includes("e")) {
+                    betaPuedeEpsilon = false;
+                    break;
+                  }
+                }
+              }
+              /*
+                Si β => ε
+              */
+              if (betaPuedeEpsilon) {
+                siguientesTemp[A].forEach((x) => {
+                    if (!siguientesTemp[B].includes(x)) {
+                      siguientesTemp[B].push(x);
+                      cambios = true;
+                    }
+                  });
+              }
+            }
+          }
+        }
+      });
+    }
+
+    setSiguientes(siguientesTemp);
   };
 
   useEffect(() => {
@@ -420,6 +591,119 @@ function App() {
             </div>
           </div>
         </div>
+      </div>
+
+
+      <div className="second-screen">
+        {/* IZQUIERDA */}
+        <div className="second-left">
+
+          {/* FIRST */}
+          <div className="second-top">
+
+            <div className="table-header">
+              Función Primera
+            </div>
+
+            <div className="table-container">
+
+              <table>
+
+                <thead>
+
+                  <tr>
+                    <th>Variable</th>
+                    <th>FIRST</th>
+                  </tr>
+
+                </thead>
+
+                <tbody>
+
+                  {
+                    Object.keys(primeros)
+                      .map((v, index) => (
+
+                        <tr key={index}>
+
+                          <td>{v}</td>
+
+                          <td>
+                            {
+                              primeros[v]
+                                .join(", ")
+                            }
+                          </td>
+
+                        </tr>
+
+                      ))
+                  }
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          </div>
+
+          {/* FOLLOW */}
+          <div className="second-bottom">
+
+            <div className="table-header">
+              Función Siguiente
+            </div>
+
+            <div className="table-container">
+
+              <table>
+
+                <thead>
+
+                  <tr>
+                    <th>Variable</th>
+                    <th>FOLLOW</th>
+                  </tr>
+
+                </thead>
+
+                <tbody>
+
+                  {
+                    Object.keys(siguientes)
+                      .map((v, index) => (
+
+                        <tr key={index}>
+
+                          <td>{v}</td>
+
+                          <td>
+                            {
+                              siguientes[v]
+                                .join(", ")
+                            }
+                          </td>
+
+                        </tr>
+
+                      ))
+                  }
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* DERECHA */}
+        <div className="second-right">
+        </div>
+
       </div>
     </div>
   );
