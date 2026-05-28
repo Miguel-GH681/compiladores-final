@@ -61,6 +61,10 @@ body,
   gap: 16px;
 }
 
+.right-column textarea{
+  background-color: #f7f7f7;
+}
+
 /* =========================
    HEADER DEL EDITOR
 ========================= */

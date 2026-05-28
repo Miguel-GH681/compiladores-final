@@ -495,7 +495,7 @@ function App() {
               onClick={analizarTexto}
               title="Presiona para ejecutar el programa"
             >
-              Ejecutar
+              Ejecutar (F5)
             </button>
 
           </div>
