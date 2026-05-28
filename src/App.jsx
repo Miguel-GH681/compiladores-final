@@ -595,12 +595,8 @@ function App() {
 
 
       <div className="second-screen">
-        {/* IZQUIERDA */}
         <div className="second-left">
-
-          {/* FIRST */}
           <div className="second-top">
-
             <div className="table-header">
               Función Primera
             </div>
@@ -612,8 +608,8 @@ function App() {
                 <thead>
 
                   <tr>
-                    <th>Variable</th>
-                    <th>FIRST</th>
+                    <th>V</th>
+                    <th>Terminales</th>
                   </tr>
 
                 </thead>
@@ -662,8 +658,8 @@ function App() {
                 <thead>
 
                   <tr>
-                    <th>Variable</th>
-                    <th>FOLLOW</th>
+                    <th>V</th>
+                    <th>Terminales</th>
                   </tr>
 
                 </thead>
