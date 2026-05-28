@@ -209,7 +209,11 @@ th {
 }
 
 .second-right {
-  width: 66.66%;
+    width: 64%;
+    margin-left: 16px;
+    margin-bottom: 16px;
+    border: 1px solid #dcdcdc;
+    border-radius: 5px;
 }
 
 .second-top,

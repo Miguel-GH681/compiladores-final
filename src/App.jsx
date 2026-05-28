@@ -13,8 +13,13 @@ function App() {
   const [terminalesSinRecursion, setTerminalesSinRecursion] = useState([]);
   const [primeros, setPrimeros] = useState({});
   const [siguientes, setSiguientes] = useState({});
- 
-  const analizarTexto = () => {
+  const [tablaLL1, setTablaLL1] = useState({});
+  const terminalesTabla = [
+    ...terminales,
+    "$"
+  ];
+
+ const analizarTexto = () => {
 
     const variablesEncontradas = [];
     const regexVariables = /([A-Za-z_][A-Za-z0-9_]*)\s*::/g;
@@ -336,15 +341,15 @@ function App() {
                 }
               }
               /*
-                Si β => ε
+                Si β => e
               */
               if (betaPuedeEpsilon) {
                 siguientesTemp[A].forEach((x) => {
-                    if (!siguientesTemp[B].includes(x)) {
-                      siguientesTemp[B].push(x);
-                      cambios = true;
-                    }
-                  });
+                  if (!siguientesTemp[B].includes(x)) {
+                    siguientesTemp[B].push(x);
+                    cambios = true;
+                  }
+                });
               }
             }
           }
@@ -353,6 +358,97 @@ function App() {
     }
 
     setSiguientes(siguientesTemp);
+    construirTablaLL1(variablesSinRecursionP, gramaticaSinRecursionP, primerosP, siguientesTemp)
+  };
+
+  const firstDeProduccion = (produccion, variablesSinRecursionP, primerosP) => {
+
+    const simbolos = produccion.split(" ");
+    const resultado = [];
+
+    for ( let i = 0; i < simbolos.length; i++) {
+      const simbolo = simbolos[i];
+
+      /*
+        TERMINAL
+      */
+      if (!variablesSinRecursionP.includes(simbolo)) {
+        if (!resultado.includes(simbolo)) {
+          resultado.push(simbolo);
+        }
+
+        return resultado;
+      }
+
+      /*
+        VARIABLE
+      */
+      const firstVar = primerosP[simbolo] || [];
+
+      firstVar.forEach((x) => {
+        if (x !== "e" && !resultado.includes(x)) {
+          resultado.push(x);
+        }
+      });
+
+      /*
+        Si NO tiene e
+      */
+      if (!firstVar.includes("e")) {
+        return resultado;
+      }
+    }
+
+    /*
+      Todos producen e
+    */
+    resultado.push("e");
+    return resultado;
+  };
+
+  const construirTablaLL1 = (variablesSinRecursionP, gramaticaSinRecursionP, primerosP, siguientesP) => {
+    const tabla = {};
+
+    /*
+      Inicializar filas
+    */
+    variablesSinRecursionP.forEach((v) => {
+      tabla[v] = {};
+    });
+
+    /*
+      Recorrer producciones
+    */
+    gramaticaSinRecursionP.forEach((item) => {
+
+      const A = item.variable;
+      const alpha = item.produccion;
+
+      /*
+        FIRST(alpha)
+      */
+      const firstAlpha = firstDeProduccion(alpha, variablesSinRecursionP, primerosP);
+
+      /*
+        FIRST(alpha) - e
+      */
+      firstAlpha.forEach((terminal) => {
+        if (terminal !== "e") {
+          tabla[A][terminal] = alpha;
+        }
+      });
+
+      /*
+        Si contiene e
+      */
+      if (firstAlpha.includes("e")) {
+        (siguientesP[A] || []).forEach((b) => {
+          tabla[A][b] = alpha;
+        });
+      }
+    });
+
+    setTablaLL1(tabla);
   };
 
   useEffect(() => {
@@ -698,8 +794,51 @@ function App() {
 
         {/* DERECHA */}
         <div className="second-right">
-        </div>
+          <div className="table-header">
+            Tabla de símbolos
+          </div>
 
+          <div className="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Variables</th>
+                  {
+                    terminalesTabla.map(
+                      (t, index) => (
+                        <th key={index}>
+                          {t}
+                        </th>
+                      )
+                    )
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  variablesSinRecursion.map(
+                    (v, index) => (
+                      <tr key={index}>
+                        <td>{v}</td>
+                        {
+                          terminalesTabla.map(
+                            (t, i) => (
+                              <td key={i}>
+                                {
+                                  tablaLL1[v]?.[t] || ""
+                                }
+                              </td>
+                            )
+                          )
+                        }
+                      </tr>
+                    )
+                  )
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   );
